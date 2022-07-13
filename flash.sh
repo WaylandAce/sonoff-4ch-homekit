@@ -1,7 +1,14 @@
-#!/bin/sh
-RTOS_SDK=../esp-open-rtos
-UART=/dev/cu.SLAB_USBtoUART
+#!/bin/bash
 
-esptool.py -p ${UART} --baud 921600 write_flash -fs 1MB -fm dout -ff 40m \
-	0x0 "${RTOS_SDK}/bootloader/firmware_prebuilt/rboot.bin" 0x1000 "${RTOS_SDK}/bootloader/firmware_prebuilt/blank_config.bin" 0x2000 ./$1
-	
+SONOFF_PORT="/dev/ttyUSB0"
+
+esptool \
+            -p $SONOFF_PORT \
+            --baud 115200 \
+            write_flash \
+            -fs 8m \
+            -fm dout \
+            -ff 40m \
+            0x0 ./src/firmware/rboot.bin \
+            0x1000 ./src/firmware/blank_config.bin \
+            0x2000 ./src/firmware/sonoff_4ch.bin

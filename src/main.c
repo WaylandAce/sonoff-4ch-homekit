@@ -46,7 +46,8 @@
 
 #include <homekit/homekit.h>
 #include <homekit/characteristics.h>
-#include <wifi_config.h>
+#include "wifi.h"
+
 
 #include "button.h"
 
@@ -76,9 +77,11 @@ void relay_write1(bool on) {
 void relay_write2(bool on) {
     gpio_write(relay_gpio2, on ? 1 : 0);
 }
+
 void relay_write3(bool on) {
     gpio_write(relay_gpio3, on ? 1 : 0);
 }
+
 void relay_write4(bool on) {
     gpio_write(relay_gpio4, on ? 1 : 0);
 }
@@ -95,23 +98,21 @@ void reset_configuration_task() {
         led_write(false);
         vTaskDelay(100 / portTICK_PERIOD_MS);
     }
-    
+
     printf("Resetting Wifi Config\n");
-    
-    wifi_config_reset();
-    
+
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    
+
     printf("Resetting HomeKit Config\n");
-    
+
     homekit_server_reset();
-    
+
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    
+
     printf("Restarting\n");
-    
+
     sdk_system_restart();
-    
+
     vTaskDelete(NULL);
 }
 
@@ -123,12 +124,15 @@ void reset_configuration() {
 homekit_characteristic_t switch_on1 = HOMEKIT_CHARACTERISTIC_(
     ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(switch_on_callback1)
 );
+
 homekit_characteristic_t switch_on2 = HOMEKIT_CHARACTERISTIC_(
     ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(switch_on_callback2)
 );
+
 homekit_characteristic_t switch_on3 = HOMEKIT_CHARACTERISTIC_(
     ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(switch_on_callback3)
 );
+
 homekit_characteristic_t switch_on4 = HOMEKIT_CHARACTERISTIC_(
     ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(switch_on_callback4)
 );
@@ -155,19 +159,22 @@ void gpio_init() {
 void switch_on_callback1(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
     relay_write1(switch_on1.value.bool_value);
 }
+
 void switch_on_callback2(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
     relay_write2(switch_on2.value.bool_value);
 }
+
 void switch_on_callback3(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
     relay_write3(switch_on3.value.bool_value);
 }
+
 void switch_on_callback4(homekit_characteristic_t *_ch, homekit_value_t on, void *context) {
     relay_write4(switch_on4.value.bool_value);
 }
 
 
 void button_callback(uint8_t gpio, button_event_t event) {
-    
+
     switch (event) {
         case button_event_single_press:
         switch (gpio) {
@@ -196,7 +203,7 @@ void button_callback(uint8_t gpio, button_event_t event) {
                 homekit_characteristic_notify(&switch_on4, switch_on4.value);
             break;
         }
-          
+
             break;
         case button_event_long_press:
             if (gpio == BUTTON_GPIO1) {
@@ -238,28 +245,64 @@ homekit_accessory_t *accessories[] = {
         HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]){
             &name,
             HOMEKIT_CHARACTERISTIC(MANUFACTURER, "iTEAD"),
-            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "037A2BABF19D"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "10306022BF"),
             HOMEKIT_CHARACTERISTIC(MODEL, "4CH"),
             HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "0.1.6"),
             HOMEKIT_CHARACTERISTIC(IDENTIFY, switch_identify),
             NULL
         }),
-        HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
+            HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Sonoff 4CH SW1"),
             &switch_on1,
             NULL
         }),
-        HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
+        NULL
+    }),
+    HOMEKIT_ACCESSORY(.id=2, .category=homekit_accessory_category_switch, .services=(homekit_service_t*[]){
+        HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]){
+            &name,
+            HOMEKIT_CHARACTERISTIC(MANUFACTURER, "iTEAD"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "10306022BF"),
+            HOMEKIT_CHARACTERISTIC(MODEL, "4CH"),
+            HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "0.1.6"),
+            HOMEKIT_CHARACTERISTIC(IDENTIFY, switch_identify),
+            NULL
+        }),
+            HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Sonoff 4CH SW2"),
             &switch_on2,
             NULL
         }),
-        HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
+        NULL
+    }),
+    HOMEKIT_ACCESSORY(.id=3, .category=homekit_accessory_category_switch, .services=(homekit_service_t*[]){
+        HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]){
+            &name,
+            HOMEKIT_CHARACTERISTIC(MANUFACTURER, "iTEAD"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "10306022BF"),
+            HOMEKIT_CHARACTERISTIC(MODEL, "4CH"),
+            HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "0.1.6"),
+            HOMEKIT_CHARACTERISTIC(IDENTIFY, switch_identify),
+            NULL
+        }),
+            HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Sonoff 4CH SW3"),
             &switch_on3,
             NULL
         }),
-        HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
+        NULL
+    }),
+    HOMEKIT_ACCESSORY(.id=4, .category=homekit_accessory_category_switch, .services=(homekit_service_t*[]){
+        HOMEKIT_SERVICE(ACCESSORY_INFORMATION, .characteristics=(homekit_characteristic_t*[]){
+            &name,
+            HOMEKIT_CHARACTERISTIC(MANUFACTURER, "iTEAD"),
+            HOMEKIT_CHARACTERISTIC(SERIAL_NUMBER, "10306022BF"),
+            HOMEKIT_CHARACTERISTIC(MODEL, "4CH"),
+            HOMEKIT_CHARACTERISTIC(FIRMWARE_REVISION, "0.1.6"),
+            HOMEKIT_CHARACTERISTIC(IDENTIFY, switch_identify),
+            NULL
+        }),
+            HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Sonoff 4CH SW4"),
             &switch_on4,
             NULL
@@ -269,46 +312,59 @@ homekit_accessory_t *accessories[] = {
     NULL
 };
 
+
 homekit_server_config_t config = {
     .accessories = accessories,
     .password = "111-11-111"
 };
 
-void on_wifi_ready() {
-    homekit_server_init(&config);
-}
-
 void create_accessory_name() {
     uint8_t macaddr[6];
     sdk_wifi_get_macaddr(STATION_IF, macaddr);
-    
+
     int name_len = snprintf(NULL, 0, "Sonoff Switch-%02X%02X%02X",
                             macaddr[3], macaddr[4], macaddr[5]);
     char *name_value = malloc(name_len+1);
     snprintf(name_value, name_len+1, "Sonoff Switch-%02X%02X%02X",
              macaddr[3], macaddr[4], macaddr[5]);
-    
+
     name.value = HOMEKIT_STRING(name_value);
+}
+
+static void wifi_init() {
+    struct sdk_station_config wifi_config = {
+        .ssid = WIFI_SSID,
+        .password = WIFI_PASSWORD,
+    };
+
+    sdk_wifi_station_set_config(&wifi_config);
+    sdk_wifi_station_connect();
+    sdk_wifi_station_set_auto_connect(true);
 }
 
 void user_init(void) {
     uart_set_baud(0, 115200);
 
     create_accessory_name();
-    
-    wifi_config_init("sonoff-4ch", NULL, on_wifi_ready);
+
+    wifi_init();
+    homekit_server_init(&config);
+
     gpio_init();
 
     if (button_create(BUTTON_GPIO1, 0, 4000, button_callback)) {
         printf("Failed to initialize button 1\n");
     }
+
     if (button_create(BUTTON_GPIO2, 0, 4000, button_callback)) {
         printf("Failed to initialize button 2\n");
     }
+
     if (button_create(BUTTON_GPIO3, 0, 4000, button_callback)) {
         printf("Failed to initialize button 3\n");
     }
+
     if (button_create(BUTTON_GPIO4, 0, 4000, button_callback)) {
         printf("Failed to initialize button 4\n");
-    }     
+    }
 }

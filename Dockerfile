@@ -1,20 +1,26 @@
-FROM ubuntu:16.04
+FROM ubuntu:22.04
 LABEL maintainer="nick-less@gmx.de"
 # install tools required by sdk
 RUN apt-get update && apt-get install -y \
 	make unrar-free autoconf automake libtool gcc g++ gperf \
-    flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial \
-    sed git unzip bash help2man wget bzip2 libtool-bin git libz-dev
+    flex bison texinfo gawk ncurses-dev libexpat-dev python2-dev python2 python3 \
+    sed git unzip bash help2man wget bzip2 libtool-bin git libz-dev python-pip
+
+RUN pip2 install pyserial
+RUN ln -s python2 /usr/bin/python
+
 # add an user, sdk wont build as root
 RUN useradd -ms /bin/bash sdkbuilder
 USER sdkbuilder
 WORKDIR /home/sdkbuilder
 # clone sdk
-RUN git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
-WORKDIR /home/sdkbuilder/esp-open-sdk
+#RUN git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
+RUN git clone --recursive https://github.com/esp-open-sdk/esp-open-sdk.git
+WORKDIR /home/sdkbuilder/esp-open-sdk/sdk
 # build sdk
 RUN make toolchain esptool libhal STANDALONE=n
-ENV PATH="/home/sdkbuilder/esp-open-sdk/xtensa-lx106-elf/bin:${PATH}"
+ENV PATH="/home/sdkbuilder/esp-open-sdk/sdk/xtensa-lx106-elf/bin:${PATH}"
+
 WORKDIR /home/sdkbuilder
 # clone open-rtos
 RUN git clone --recursive https://github.com/Superhouse/esp-open-rtos.git
