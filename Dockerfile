@@ -38,8 +38,3 @@ RUN git clone --recursive https://github.com/maximkulkin/esp-wolfssl.git wolfssl
 WORKDIR /home/sdkbuilder/esp-homekit/
 # now we have anything to build an open-rtos homekit firmware
 CMD ["/bin/sh","-c", "make -j4 -C src"]
-#
-# build
-# docker build --tag=cross/esp8266 .
-# run
-# docker run -v <localpath>:<containerpath> -it cross/esp8266
