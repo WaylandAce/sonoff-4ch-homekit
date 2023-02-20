@@ -15,7 +15,7 @@ USER sdkbuilder
 WORKDIR /home/sdkbuilder
 # clone sdk
 #RUN git clone --recursive https://github.com/pfalcon/esp-open-sdk.git
-RUN git clone --recursive https://github.com/esp-open-sdk/esp-open-sdk.git
+RUN git clone --recursive https://github.com/WaylandAce/esp-open-sdk.git
 WORKDIR /home/sdkbuilder/esp-open-sdk/sdk
 # build sdk
 RUN make toolchain esptool libhal STANDALONE=n
